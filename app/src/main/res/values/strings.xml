@@ -35,5 +35,7 @@
     <string name="gallery">Галерея</string>
     <string name="camera">Камера</string>
     <string name="download_message">Данные обновляются. Пожалуйста, подождите...</string>
+    <string name="key_use_rx">key_use_rx</string>
+    <string name="useRX">Использовать RxJava для загрузки</string>
 
 </resources>

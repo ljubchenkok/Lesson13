@@ -27,4 +27,9 @@
         android:key="@string/key_start_download"
         android:title="@string/startDownloadLabel" />
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="@string/key_use_rx"
+        android:title="@string/useRX" />
+
 </PreferenceScreen>

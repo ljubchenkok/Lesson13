@@ -20,11 +20,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 
-import butterknife.BindString;
+import java.util.List;
+
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import ru.com.penza.lesson12.datamodel.Contact;
+import ru.com.penza.lesson12.datamodel.Person;
+import ru.com.penza.lesson12.datasources.ApiUtils;
+import ru.com.penza.lesson12.datasources.MyDBHelper;
+import ru.com.penza.lesson12.datasources.RxService;
 import ru.com.penza.lesson12.fragments.AddCardFragment;
 import ru.com.penza.lesson12.fragments.ListFragment;
 
@@ -39,7 +52,8 @@ public class MainActivity extends AppCompatActivity implements AddCardFragment.O
     private static final int LIST_FRAGMENT_ID = 1;
     private static final String PERSON_ID = "person_id";
     private static final String KEY_START_DOWNLOAD = "key_start_download";
-
+    private static final String KEY_USE_RX = "key_use_rx";
+    private MyDBHelper myDBHelper;
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
@@ -63,17 +77,17 @@ public class MainActivity extends AppCompatActivity implements AddCardFragment.O
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-                    if(!isFinishing() && !isChangingConfigurations()) {
+                    if (!isFinishing() && !isChangingConfigurations()) {
                         showListFragment();
                     }
                     break;
                 case 1:
-                    if(dialog != null) {
+                    if (dialog != null) {
                         dialog.show();
                     }
                     break;
                 case 2:
-                    if(dialog != null && dialog.isShowing()) {
+                    if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
                     }
                     break;
@@ -95,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements AddCardFragment.O
         handler = new Handler(new MyHandlerCallback());
         dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.download_message));
+        myDBHelper = new MyDBHelper(this);
 
         if (savedInstanceState != null) {
             int currentFragmentId = savedInstanceState.getInt(CURRENT_FRAGMENT);
@@ -105,17 +120,32 @@ public class MainActivity extends AppCompatActivity implements AddCardFragment.O
             }
 
         }
-        watchInetConnection = (MyBackgroundTask) getLastCustomNonConfigurationInstance();
-        if(watchInetConnection == null) {
-            watchInetConnection = new MyBackgroundTask(this, handler);
-        }
-        watchInetConnection.link(this);
-        if(needDownloadfromWeb()) {
-            refresh();
-        }
+        initDB();
         showListFragment();
 
     }
+
+    private void initDB() {
+        watchInetConnection = (MyBackgroundTask) getLastCustomNonConfigurationInstance();
+        if (watchInetConnection == null) {
+            watchInetConnection = new MyBackgroundTask(this, handler);
+        }
+        watchInetConnection.link(this);
+        if (needDownloadfromWeb()) {
+            if (needUseRx()) {
+                getPersons();
+            } else {
+                refresh();
+            }
+        }
+
+    }
+
+    private boolean needUseRx() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean(KEY_USE_RX, false);
+    }
+
 
     private boolean needDownloadfromWeb() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -198,12 +228,17 @@ public class MainActivity extends AppCompatActivity implements AddCardFragment.O
 
     @Override
     public void refresh() {
-        AsyncTask.Status status = watchInetConnection.getStatus();
-        if(status == AsyncTask.Status.FINISHED){
-            watchInetConnection = new MyBackgroundTask(this,handler);
-        }
-        if(watchInetConnection.getStatus() != AsyncTask.Status.RUNNING){
-            watchInetConnection.execute();
+        if (!needUseRx()) {
+
+            AsyncTask.Status status = watchInetConnection.getStatus();
+            if (status == AsyncTask.Status.FINISHED) {
+                watchInetConnection = new MyBackgroundTask(this, handler);
+            }
+            if (watchInetConnection.getStatus() != AsyncTask.Status.RUNNING) {
+                watchInetConnection.execute();
+            }
+        } else {
+            getPersons();
         }
     }
 
@@ -213,8 +248,10 @@ public class MainActivity extends AppCompatActivity implements AddCardFragment.O
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
-        if(watchInetConnection !=null && watchInetConnection.getStatus().equals(AsyncTask.Status.RUNNING)){
-            watchInetConnection.cancel(true);
+        if(!needUseRx()) {
+            if (watchInetConnection != null && watchInetConnection.getStatus().equals(AsyncTask.Status.RUNNING)) {
+                watchInetConnection.cancel(true);
+            }
         }
         unbinder.unbind();
     }
@@ -223,9 +260,9 @@ public class MainActivity extends AppCompatActivity implements AddCardFragment.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-            if (requestCode == SETTINGS) {
-                showListFragment();
-            }
+        if (requestCode == SETTINGS) {
+            showListFragment();
+        }
 
     }
 
@@ -233,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements AddCardFragment.O
     public Object onRetainCustomNonConfigurationInstance() {
         watchInetConnection.unLink();
         return watchInetConnection;
+
     }
 
     @Override
@@ -247,6 +285,41 @@ public class MainActivity extends AppCompatActivity implements AddCardFragment.O
         } else {
             outState.putInt(CURRENT_FRAGMENT, LIST_FRAGMENT_ID);
         }
+    }
+
+    public void getPersons() {
+        RxService rxService = ApiUtils.getRxService();
+        Observable<List<Person>> observable = rxService.getAnswers().subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+        observable.subscribe(new Observer<List<Person>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(List<Person> persons) {
+                myDBHelper.resetDB();
+                handler.sendEmptyMessage(1);
+                for (int id = 0; id < persons.size(); id++) {
+                    if (myDBHelper != null) {
+                        myDBHelper.addPerson(persons.get(id));
+                    }
+                }
+                handler.sendEmptyMessage(2);
+                handler.sendEmptyMessage(0);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
     }
 
 

@@ -2,6 +2,7 @@ package ru.com.penza.lesson12.datasources;
 
 
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
@@ -17,4 +18,17 @@ class RetrofitClient {
         }
         return retrofit;
     }
+
+    static Retrofit getRxClient(String baseUrl) {
+        if (retrofit==null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+        }
+        return retrofit;
+    }
+
+
 }

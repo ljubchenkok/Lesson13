@@ -144,8 +144,6 @@ public class AddCardFragment extends Fragment {
             MyDBHelper myDBHelper = new MyDBHelper(getActivity());
             person = myDBHelper.getPersonById(personId);
             imageView.setTransitionName(TRANSITION_PHOTO_NAME + personId);
-            //imageContainer.setBackgroundColor(Color.parseColor(person.getColor()));
-            //imageContainer.setTransitionName(TRANSITION_CONTAINER_NAME + personId);
             editName.setText(person.getFirstName());
             editSurName.setText(person.getLastName());
             editPatron.setText(person.getSecondName());
@@ -293,7 +291,8 @@ public class AddCardFragment extends Fragment {
             public void onOk(AmbilWarnaDialog dialog, int color) {
                 person.setColor(String.format("#%06X", (0xFFFFFF & color)));
                 btnColor.setBackgroundColor(color);
-                imageContainer.setBackgroundColor(color);
+                showImage();
+
             }
 
             @Override

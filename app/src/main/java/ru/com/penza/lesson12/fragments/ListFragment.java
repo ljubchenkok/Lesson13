@@ -196,7 +196,6 @@ public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnIte
     public void onItemClick(Person person, MyRecycleViewAdapter.PersonViewHolder holder) {
         AddCardFragment addCardFragment = AddCardFragment.newInstance(person.getId());
         String transitionNameforPhoto = AddCardFragment.TRANSITION_PHOTO_NAME + String.valueOf(person.getId());
-        //String transitionNameforContainer = AddCardFragment.TRANSITION_CONTAINER_NAME + String.valueOf(person.getId());
         addCardFragment.setSharedElementEnterTransition(new MyTransitionSet());
         addCardFragment.setEnterTransition(new Fade());
         setExitTransition(new Fade());
@@ -204,7 +203,6 @@ public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnIte
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .addSharedElement(holder.imageView, transitionNameforPhoto)
-                //.addSharedElement(holder.imageContainer, transitionNameforContainer)
                 .replace(R.id.container, addCardFragment)
                 .addToBackStack(null)
                 .commit();

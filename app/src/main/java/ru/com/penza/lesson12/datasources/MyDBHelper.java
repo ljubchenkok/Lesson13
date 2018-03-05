@@ -10,6 +10,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.com.penza.lesson12.datamodel.Contact;
 import ru.com.penza.lesson12.datamodel.Person;
 
 
@@ -77,6 +78,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, null, contentValues);
         db.close();
     }
+
 
     public void updatePerson(Person person) {
         SQLiteDatabase db = this.getWritableDatabase();
