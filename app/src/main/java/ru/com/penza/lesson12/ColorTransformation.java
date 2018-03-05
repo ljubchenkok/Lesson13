@@ -30,7 +30,7 @@ public class ColorTransformation implements Transformation {
                 drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         drawable.draw(canvas);
         drawable.setColorFilter(null);
         drawable.setCallback(null);

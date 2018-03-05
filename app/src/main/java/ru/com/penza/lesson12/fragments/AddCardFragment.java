@@ -160,13 +160,13 @@ public class AddCardFragment extends Fragment {
         int colorWithAlpha = ColorUtils.setAlphaComponent(color, alpha);
         if (person.getImageUrl() == null) {
             Picasso.with(getContext()).load(R.drawable.einstein)
-                    .transform(new CropCircleTransformation())
                     .transform(new ColorTransformation(colorWithAlpha))
+                    .transform(new CropCircleTransformation())
                     .into(imageView);
         } else {
             Picasso.with(getContext()).load(Uri.parse(person.getImageUrl()))
-                    .transform(new CropCircleTransformation())
                     .transform(new ColorTransformation(colorWithAlpha))
+                    .transform(new CropCircleTransformation())
                     .into(imageView);
         }
     }
