@@ -16,7 +16,7 @@ import ru.com.penza.lesson13.datamodel.Person;
 public class MyDBHelper extends SQLiteOpenHelper {
     private static final String DBNAME = "Persons.db";
     private static final String TABLE_NAME = "Persons";
-    private static final int VERSION = 5;
+    private static final int VERSION = 10;
 
     private static final int CURSOR_ID = 0;
     private static final int CURSOR_LAST_NAME = 1;
@@ -25,6 +25,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
     private static final int CURSOR_COLOR = 4;
     private static final int CURSOR_PHONE = 5;
     private static final int CURSOR_IMAGE_URL = 6;
+    private static final int CURSOR_ADDRESS = 7;
+    private static final int CURSOR_LONGTITUDE = 8;
+    private static final int CURSOR_LATITUDE = 9;
 
 
 
@@ -41,8 +44,12 @@ public class MyDBHelper extends SQLiteOpenHelper {
                 Person.SECOND_NAME + " TEXT, " +
                 Person.COLOR + " TEXT, " +
                 Person.PHONE + " TEXT, "   +
-                Person.IMAGE_URL + " TEXT )");
+                Person.IMAGE_URL + " TEXT, " +
+                Person.ADDRESS  + " TEXT, " +
+                Person.LONGTITUDE  + " DOUBLE, " +
+                Person.LATITUDE + " DOUBLE)");
     }
+
 
     public  void resetDB(){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -52,7 +59,11 @@ public class MyDBHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion != newVersion){
+            db.execSQL("DROP TABLE " + TABLE_NAME);
+            onCreate(db);
+        }
 
     }
 
@@ -73,6 +84,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
         contentValues.put(Person.PHONE, person.getPhone());
         contentValues.put(Person.COLOR, person.getColor());
         contentValues.put(Person.IMAGE_URL,person.getImageUrl());
+        contentValues.put(Person.ADDRESS,person.getAddress());
+        contentValues.put(Person.LONGTITUDE,person.getLongtitude());
+        contentValues.put(Person.LATITUDE,person.getLatitude());
         db.insert(TABLE_NAME, null, contentValues);
         db.close();
     }
@@ -88,7 +102,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
         values.put(Person.COLOR, person.getColor());
         values.put(Person.PHONE,person.getPhone());
         values.put(Person.IMAGE_URL, person.getImageUrl());
-
+        values.put(Person.ADDRESS, person.getAddress());
+        values.put(Person.LONGTITUDE, person.getLongtitude());
+        values.put(Person.LATITUDE, person.getLatitude());
         db.update(TABLE_NAME, values, Person.ID + " = ?",
                 new String[]{String.valueOf(person.getId())});
     }
@@ -97,7 +113,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
         Person person = new Person();
         String selectQuery = "SELECT " + Person.ID + ", "
                 + Person.LAST_NAME + ", " + Person.FIRST_NAME + ", " + Person.SECOND_NAME
-                + ", " + Person.COLOR + ", " + Person.PHONE  + " ," + Person.IMAGE_URL  + " FROM " + TABLE_NAME
+                + ", " + Person.COLOR + ", " + Person.PHONE  + " ," + Person.IMAGE_URL
+                + ", " + Person.ADDRESS + ", " + Person.LONGTITUDE  + " ," + Person.LATITUDE
+                + " FROM " + TABLE_NAME
                 + " WHERE " + Person.ID + "=" + String.valueOf(id);
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -109,6 +127,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
             person.setColor(cursor.getString(CURSOR_COLOR));
             person.setPhone(cursor.getString(CURSOR_PHONE));
             person.setImageURL(cursor.getString(CURSOR_IMAGE_URL));
+            person.setAddress(cursor.getString(CURSOR_ADDRESS));
+            person.setLongtitude(cursor.getDouble(CURSOR_LONGTITUDE));
+            person.setLatitude(cursor.getDouble(CURSOR_LATITUDE));
 
         }
         cursor.close();
@@ -137,7 +158,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
         List<Person> persons = new ArrayList<>();
         String selectQuery = "SELECT " + Person.ID + ", "
                 + Person.LAST_NAME + ", " + Person.FIRST_NAME + ", " + Person.SECOND_NAME
-                + ", " + Person.COLOR + ", " + Person.PHONE   + " ," + Person.IMAGE_URL  + " FROM " + TABLE_NAME
+                + ", " + Person.COLOR + ", " + Person.PHONE   + ", " + Person.IMAGE_URL
+                + ", " + Person.ADDRESS + ", " + Person.LONGTITUDE  + ", " + Person.LATITUDE
+                + " FROM " + TABLE_NAME
                 + " ORDER BY " + Person.LAST_NAME;
         if (sortOrder){
             selectQuery = selectQuery + " DESC";
@@ -156,6 +179,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
                 person.setColor(cursor.getString(CURSOR_COLOR));
                 person.setPhone(cursor.getString(CURSOR_PHONE));
                 person.setImageURL(cursor.getString(CURSOR_IMAGE_URL));
+                person.setAddress(cursor.getString(CURSOR_ADDRESS));
+                person.setLongtitude(cursor.getDouble(CURSOR_LONGTITUDE));
+                person.setLatitude(cursor.getDouble(CURSOR_LATITUDE));
                 persons.add(person);
             } while (cursor.moveToNext());
         }

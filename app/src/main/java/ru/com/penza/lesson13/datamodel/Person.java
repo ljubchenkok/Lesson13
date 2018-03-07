@@ -13,10 +13,42 @@ public class Person extends Contact {
     public static final String COLOR = "color";
     public static final String PHONE = "phone";
     public static final String IMAGE_URL = "image";
+    public static final String ADDRESS = "address";
+    public static final String LATITUDE = "latitude";
+    public static final String LONGTITUDE = "longtitude";
+
 
 
     private String imageURL;
     private Integer id;
+    private String address;
+    private Double longtitude;
+    private Double latitude;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public Double getLongtitude() {
+        return longtitude;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setAddress(String address) {
+
+        this.address = address;
+    }
+
+    public void setLongtitude(Double longtitude) {
+        this.longtitude = longtitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;

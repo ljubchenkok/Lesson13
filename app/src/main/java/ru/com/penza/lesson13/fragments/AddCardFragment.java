@@ -1,17 +1,22 @@
 package ru.com.penza.lesson13.fragments;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
@@ -26,8 +31,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -42,7 +50,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
+import retrofit2.http.PUT;
 import ru.com.penza.lesson13.ColorTransformation;
+import ru.com.penza.lesson13.FetchAddressIntentService;
 import ru.com.penza.lesson13.R;
 import ru.com.penza.lesson13.datamodel.Person;
 import ru.com.penza.lesson13.datasources.MyDBHelper;
@@ -52,6 +62,16 @@ import static android.app.Activity.RESULT_OK;
 
 
 public class AddCardFragment extends Fragment {
+
+
+
+    public static final String RECEIVER = "RECEIVER";
+    public static final String ADDRESS = "ADDRESS";
+    public static final String LATITUDE = "LATITUDE";
+    public static final String LONGTITUDE = "LONGTITUDE";
+    public static final String LOCATION_DATA_EXTRA = "LOCATION_DATA_EXTRA";
+    public static final int SUCCESS_RESULT = 0;
+    public static final int FAILURE_RESULT = 1;
 
 
     private static final java.lang.String PERSON_ID = "id";
@@ -66,7 +86,13 @@ public class AddCardFragment extends Fragment {
     AmbilWarnaDialog dialog;
 
 
+    private FusedLocationProviderClient fusedLocationClient;
+    private Location lastLocation;
+    private String addressOutput;
+    private AddressResultReceiver resultReceiver;
 
+    @BindView(R.id.positionLabel)
+    TextView positionView;
 
     @BindView(R.id.btnSave)
     Button btnSave;
@@ -92,7 +118,6 @@ public class AddCardFragment extends Fragment {
     @BindInt(R.integer.alpha)
     int alpha;
 
-
     Unbinder unbinder;
     private int personId;
     private Uri imageUri;
@@ -108,6 +133,7 @@ public class AddCardFragment extends Fragment {
         editPhone.setOnEditorActionListener(myListener);
         return view;
     }
+
 
     private TextView.OnEditorActionListener myListener = new TextView.OnEditorActionListener() {
         @Override
@@ -150,6 +176,10 @@ public class AddCardFragment extends Fragment {
             editSurName.setText(person.getLastName());
             editPatron.setText(person.getSecondName());
             editPhone.setText(person.getPhone());
+            String address = person.getAddress();
+            if(address != null) {
+                positionView.setText(person.getAddress());
+            }
             showImage();
             myDBHelper.close();
 
@@ -176,7 +206,7 @@ public class AddCardFragment extends Fragment {
     @OnClick(R.id.person_photo)
     public void showImageDialog() {
         final Context context = getContext();
-        if(!isCameraAvailable(context)){
+        if (!isCameraAvailable(context)) {
             changeImage();
             return;
         }
@@ -186,7 +216,7 @@ public class AddCardFragment extends Fragment {
         builder.setPositiveButton(R.string.gallery, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-               changeImage();
+                changeImage();
             }
         });
         builder.setNegativeButton(R.string.camera, new DialogInterface.OnClickListener() {
@@ -207,14 +237,12 @@ public class AddCardFragment extends Fragment {
     }
 
 
-
     private void changeImage() {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, RESULT_LOAD_IMG);
 
     }
-
 
 
     @Override
@@ -226,10 +254,10 @@ public class AddCardFragment extends Fragment {
                 Picasso.with(getContext()).load(imageUri).transform(new CropCircleTransformation())
                         .into(imageView);
             }
-            if (requestCode == CAMERA_RESULT){
-                    Picasso.with(getContext()).load(myPhotoUri).transform(new CropCircleTransformation())
-                            .into(imageView);
-                    person.setImageURL(myPhotoUri.toString());
+            if (requestCode == CAMERA_RESULT) {
+                Picasso.with(getContext()).load(myPhotoUri).transform(new CropCircleTransformation())
+                        .into(imageView);
+                person.setImageURL(myPhotoUri.toString());
 
             }
         }
@@ -238,11 +266,11 @@ public class AddCardFragment extends Fragment {
 
     private void createPhoto() {
         MyDBHelper myDBHelper = new MyDBHelper(getActivity());
-        int id = myDBHelper.getPersonCount()+1;
+        int id = myDBHelper.getPersonCount() + 1;
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         String timeStamp =
                 new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String fileName = FILE_NAME_BASE+String.valueOf(id)+"-" + timeStamp + ".jpg";
+        String fileName = FILE_NAME_BASE + String.valueOf(id) + "-" + timeStamp + ".jpg";
         File file = new File(
                 Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_PICTURES
@@ -262,9 +290,12 @@ public class AddCardFragment extends Fragment {
         return list.size() > 0;
     }
 
-    @OnClick(R.id.btnPosition)
-    public void onGetPosition(){
-        Toast.makeText(getContext(),"Position",Toast.LENGTH_SHORT).show();
+
+    private void startIntentService() {
+        Intent intent = new Intent(getActivity(), FetchAddressIntentService.class);
+        intent.putExtra(RECEIVER, resultReceiver);
+        intent.putExtra(LOCATION_DATA_EXTRA, lastLocation);
+        getActivity().startService(intent);
     }
 
     @OnClick(R.id.btnSave)
@@ -348,6 +379,39 @@ public class AddCardFragment extends Fragment {
         unbinder.unbind();
     }
 
+    @OnClick(R.id.btnPosition)
+    public void getAddress() {
+        resultReceiver = new AddressResultReceiver(new Handler());
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        lastLocation = location;
+                        startIntentService();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        onPositionFailure();
+
+
+                    }
+                });
+
+
+    }
+
+    private void onPositionFailure() {
+        addressOutput = getString(R.string.position_failure);
+        positionView.setText(addressOutput);
+    }
+
 
     public interface OnFragmentInteractionListener {
 
@@ -355,4 +419,25 @@ public class AddCardFragment extends Fragment {
     }
 
 
+    private class AddressResultReceiver extends ResultReceiver {
+        AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            if (resultCode != SUCCESS_RESULT) {
+                onPositionFailure();
+            } else {
+                positionView.setText(resultData.getString(ADDRESS));
+                person.setAddress(resultData.getString(ADDRESS));
+                person.setLongtitude(resultData.getDouble(LONGTITUDE));
+                person.setLatitude(resultData.getDouble(LATITUDE));
+
+
+            }
+
+        }
+    }
 }
