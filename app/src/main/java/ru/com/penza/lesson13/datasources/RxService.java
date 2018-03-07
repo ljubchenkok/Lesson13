@@ -1,11 +1,11 @@
-package ru.com.penza.lesson12.datasources;
+package ru.com.penza.lesson13.datasources;
 
 import java.util.List;
 
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
-import ru.com.penza.lesson12.datamodel.Person;
+import ru.com.penza.lesson13.datamodel.Person;
 
 
 /**

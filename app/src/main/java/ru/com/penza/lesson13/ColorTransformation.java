@@ -1,4 +1,4 @@
-package ru.com.penza.lesson12;
+package ru.com.penza.lesson13;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

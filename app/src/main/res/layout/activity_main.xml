@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.com.penza.lesson12.MainActivity">
+    tools:context="ru.com.penza.lesson13.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

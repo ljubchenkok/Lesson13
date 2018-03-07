@@ -1,4 +1,4 @@
-package ru.com.penza.lesson12.datamodel;
+package ru.com.penza.lesson13.datamodel;
 
 
 import com.google.gson.annotations.Expose;

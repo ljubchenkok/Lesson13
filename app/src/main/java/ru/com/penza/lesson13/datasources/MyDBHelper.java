@@ -1,17 +1,15 @@
-package ru.com.penza.lesson12.datasources;
+package ru.com.penza.lesson13.datasources;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.com.penza.lesson12.datamodel.Contact;
-import ru.com.penza.lesson12.datamodel.Person;
+import ru.com.penza.lesson13.datamodel.Person;
 
 
 

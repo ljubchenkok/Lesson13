@@ -1,18 +1,12 @@
-package ru.com.penza.lesson12.views;
+package ru.com.penza.lesson13.views;
 
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Shader;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -25,15 +19,14 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
-import ru.com.penza.lesson12.R;
-import ru.com.penza.lesson12.datamodel.Person;
-import ru.com.penza.lesson12.fragments.AddCardFragment;
+import ru.com.penza.lesson13.R;
+import ru.com.penza.lesson13.datamodel.Person;
+import ru.com.penza.lesson13.fragments.AddCardFragment;
 
 public class MyRecycleViewAdapter extends RecyclerView.Adapter {
     private int fontSize = 30;

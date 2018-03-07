@@ -1,10 +1,6 @@
-package ru.com.penza.lesson12;
+package ru.com.penza.lesson13;
 
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 
@@ -13,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Response;
-import ru.com.penza.lesson12.datamodel.Person;
-import ru.com.penza.lesson12.datasources.ApiUtils;
-import ru.com.penza.lesson12.datasources.MyDBHelper;
-import ru.com.penza.lesson12.datasources.SOService;
+import ru.com.penza.lesson13.datamodel.Person;
+import ru.com.penza.lesson13.datasources.ApiUtils;
+import ru.com.penza.lesson13.datasources.MyDBHelper;
+import ru.com.penza.lesson13.datasources.SOService;
 
 public class MyBackgroundTask extends AsyncTask<Void, Void, Void> {
 

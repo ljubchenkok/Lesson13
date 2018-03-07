@@ -1,4 +1,4 @@
-package ru.com.penza.lesson12.fragments;
+package ru.com.penza.lesson13.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,17 +18,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
-import butterknife.BindString;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import ru.com.penza.lesson12.MyTransitionSet;
-import ru.com.penza.lesson12.datasources.MyDBHelper;
-import ru.com.penza.lesson12.views.MyRecycleViewAdapter;
-import ru.com.penza.lesson12.views.MyRecyclerView;
-import ru.com.penza.lesson12.datamodel.Person;
-import ru.com.penza.lesson12.R;
-import ru.com.penza.lesson12.views.OnLoadMoreListener;
+import ru.com.penza.lesson13.MyTransitionSet;
+import ru.com.penza.lesson13.datasources.MyDBHelper;
+import ru.com.penza.lesson13.views.MyRecycleViewAdapter;
+import ru.com.penza.lesson13.views.MyRecyclerView;
+import ru.com.penza.lesson13.datamodel.Person;
+import ru.com.penza.lesson13.R;
+import ru.com.penza.lesson13.views.OnLoadMoreListener;
 
 
 public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
@@ -196,6 +196,7 @@ public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnIte
     public void onItemClick(Person person, MyRecycleViewAdapter.PersonViewHolder holder) {
         AddCardFragment addCardFragment = AddCardFragment.newInstance(person.getId());
         String transitionNameforPhoto = AddCardFragment.TRANSITION_PHOTO_NAME + String.valueOf(person.getId());
+        String transitionNameforContainer = AddCardFragment.TRANSITION_CONTAINER_NAME + String.valueOf(person.getId());
         addCardFragment.setSharedElementEnterTransition(new MyTransitionSet());
         addCardFragment.setEnterTransition(new Fade());
         setExitTransition(new Fade());
@@ -203,6 +204,7 @@ public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnIte
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .addSharedElement(holder.imageView, transitionNameforPhoto)
+                .addSharedElement(holder.imageContainer, transitionNameforContainer)
                 .replace(R.id.container, addCardFragment)
                 .addToBackStack(null)
                 .commit();

@@ -1,11 +1,10 @@
-package ru.com.penza.lesson12.fragments;
+package ru.com.penza.lesson13.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,6 +26,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -41,10 +42,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
-import ru.com.penza.lesson12.ColorTransformation;
-import ru.com.penza.lesson12.R;
-import ru.com.penza.lesson12.datamodel.Person;
-import ru.com.penza.lesson12.datasources.MyDBHelper;
+import ru.com.penza.lesson13.ColorTransformation;
+import ru.com.penza.lesson13.R;
+import ru.com.penza.lesson13.datamodel.Person;
+import ru.com.penza.lesson13.datasources.MyDBHelper;
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 import static android.app.Activity.RESULT_OK;
@@ -65,8 +66,7 @@ public class AddCardFragment extends Fragment {
     AmbilWarnaDialog dialog;
 
 
-    @BindView(R.id.btnColor)
-    Button btnColor;
+
 
     @BindView(R.id.btnSave)
     Button btnSave;
@@ -144,12 +144,13 @@ public class AddCardFragment extends Fragment {
             MyDBHelper myDBHelper = new MyDBHelper(getActivity());
             person = myDBHelper.getPersonById(personId);
             imageView.setTransitionName(TRANSITION_PHOTO_NAME + personId);
+            imageContainer.setBackgroundColor(Color.parseColor(person.getColor()));
+            imageContainer.setTransitionName(TRANSITION_CONTAINER_NAME + personId);
             editName.setText(person.getFirstName());
             editSurName.setText(person.getLastName());
             editPatron.setText(person.getSecondName());
             editPhone.setText(person.getPhone());
             showImage();
-            btnColor.setBackgroundColor(Color.parseColor(person.getColor()));
             myDBHelper.close();
 
         }
@@ -194,6 +195,12 @@ public class AddCardFragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 createPhoto();
 
+            }
+        });
+        builder.setNeutralButton(R.string.change_bkg, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                chooseColor();
             }
         });
         builder.show();
@@ -255,6 +262,10 @@ public class AddCardFragment extends Fragment {
         return list.size() > 0;
     }
 
+    @OnClick(R.id.btnPosition)
+    public void onGetPosition(){
+        Toast.makeText(getContext(),"Position",Toast.LENGTH_SHORT).show();
+    }
 
     @OnClick(R.id.btnSave)
     public void onSave(View view) {
@@ -284,13 +295,13 @@ public class AddCardFragment extends Fragment {
         return personId;
     }
 
-    @OnClick(R.id.btnColor)
-    public void chooseColor(View view) {
+
+    public void chooseColor() {
         dialog = new AmbilWarnaDialog(getContext(), Color.parseColor(person.getColor()), true, new AmbilWarnaDialog.OnAmbilWarnaListener() {
             @Override
             public void onOk(AmbilWarnaDialog dialog, int color) {
                 person.setColor(String.format("#%06X", (0xFFFFFF & color)));
-                btnColor.setBackgroundColor(color);
+                imageContainer.setBackgroundColor(color);
                 showImage();
 
             }

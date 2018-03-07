@@ -6,7 +6,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/margin_card"
-    tools:context="ru.com.penza.lesson12.fragments.AddCardFragment">
+    tools:context="ru.com.penza.lesson13.fragments.AddCardFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -121,22 +121,24 @@
                 mask:mask="###-###-####" />
 
             <TextView
-                android:id="@+id/colorLabel"
+                android:id="@+id/positionLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/btnColor"
+                android:layout_alignBaseline="@id/btnPosition"
                 android:layout_below="@+id/phone"
                 android:layout_marginStart="@dimen/margin_card"
+                android:layout_marginTop="@dimen/margin_card"
                 android:gravity="center_horizontal"
-                android:text="@string/colorLabel" />
+                android:text="@string/positionLabel" />
 
 
-            <Button
-                android:id="@+id/btnColor"
+            <ImageButton
+                android:id="@+id/btnPosition"
                 android:layout_width="80dp"
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/phone"
+                android:src="@drawable/ic_edit_location_black_24dp"
                 android:layout_marginBottom="@dimen/margin_card"
                 android:layout_marginEnd="@dimen/margin_card"
                 android:layout_marginStart="@dimen/margin_card" />
@@ -145,7 +147,7 @@
                 android:id="@+id/btnSave"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/btnColor"
+                android:layout_below="@+id/btnPosition"
                 android:layout_marginEnd="@dimen/margin_card"
                 android:layout_marginStart="@dimen/margin_card"
                 android:text="@string/btn_save" />

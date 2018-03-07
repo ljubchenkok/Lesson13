@@ -1,4 +1,4 @@
-package ru.com.penza.lesson12;
+package ru.com.penza.lesson13;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -29,17 +29,15 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.com.penza.lesson12.datamodel.Contact;
-import ru.com.penza.lesson12.datamodel.Person;
-import ru.com.penza.lesson12.datasources.ApiUtils;
-import ru.com.penza.lesson12.datasources.MyDBHelper;
-import ru.com.penza.lesson12.datasources.RxService;
-import ru.com.penza.lesson12.fragments.AddCardFragment;
-import ru.com.penza.lesson12.fragments.ListFragment;
+import ru.com.penza.lesson13.datamodel.Person;
+import ru.com.penza.lesson13.datasources.ApiUtils;
+import ru.com.penza.lesson13.datasources.MyDBHelper;
+import ru.com.penza.lesson13.datasources.RxService;
+import ru.com.penza.lesson13.fragments.AddCardFragment;
+import ru.com.penza.lesson13.fragments.ListFragment;
 
 
 public class MainActivity extends AppCompatActivity implements AddCardFragment.OnFragmentInteractionListener,
