@@ -20,6 +20,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,6 +81,7 @@ public class AddCardFragment extends Fragment {
 
     private static final java.lang.String PERSON_ID = "id";
     private static final String FILE_NAME_BASE = "lesson11-";
+    private static final String GOOGLE_MAPS_BASE_URL = "https://maps.google.com/?q=@" ;
     private final int CAMERA_RESULT = 57;
     public static final String TRANSITION_PHOTO_NAME = "transition_name_for_photo";
     public static final String TRANSITION_CONTAINER_NAME = "transition_name_for_container";
@@ -419,6 +425,23 @@ public class AddCardFragment extends Fragment {
     }
 
 
+    private View.OnClickListener positionListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_MAPS_BASE_URL +
+            person.getLatitude().toString() + "," +person.getLongtitude().toString()));
+            startActivity(intent);
+        }
+    };
+
+    public static void makeTextViewHyperlink(TextView tv) {
+        SpannableStringBuilder ssb = new SpannableStringBuilder();
+        ssb.append(tv.getText());
+        ssb.setSpan(new URLSpan("#"), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tv.setText(ssb, TextView.BufferType.SPANNABLE);
+    }
+
+
     private class AddressResultReceiver extends ResultReceiver {
         AddressResultReceiver(Handler handler) {
             super(handler);
@@ -434,6 +457,9 @@ public class AddCardFragment extends Fragment {
                 person.setAddress(resultData.getString(ADDRESS));
                 person.setLongtitude(resultData.getDouble(LONGTITUDE));
                 person.setLatitude(resultData.getDouble(LATITUDE));
+                positionView.setClickable(true);
+                makeTextViewHyperlink(positionView);
+                positionView.setOnClickListener(positionListener);
 
 
             }
