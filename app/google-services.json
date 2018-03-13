@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1030375910801",
+    "firebase_url": "https://lesson13-db8ef.firebaseio.com",
+    "project_id": "lesson13-db8ef",
+    "storage_bucket": "lesson13-db8ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1030375910801:android:ff04e23c1a172e21",
+        "android_client_info": {
+          "package_name": "ru.com.penza.lesson12"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1030375910801-hv684u8hp6or3kn7h0empntvgucabuu3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.com.penza.lesson12",
+            "certificate_hash": "bc380a4b8368cda425394fbc19633d9317c611e4"
+          }
+        },
+        {
+          "client_id": "1030375910801-rjfs6taq7b3hd3n599vnrtjv26mjdofh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4Tr8lJCulTBVlIlziAQVJToX6_U-Cbsc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1030375910801-rjfs6taq7b3hd3n599vnrtjv26mjdofh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

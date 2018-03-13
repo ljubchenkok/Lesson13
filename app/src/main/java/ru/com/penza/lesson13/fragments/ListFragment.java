@@ -16,6 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +38,9 @@ public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnIte
 
 
     private static final long PAGING_DELAY = 1000;
+    private static final String PERSON_CLICK = "PERSON_CLICK";
+    private static final String PERSON_LAST_NAME = "PERSON_LAST_NAME";
+    private static final String PERSON_ID = "PERSON_ID";
     private String fontSize;
     private String scrollSpeed;
     private int limit = 10;
@@ -48,6 +54,7 @@ public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnIte
     private static final String KEY_SORT = "key_sort";
     private static final String KEY_FONT = "key_font";
     private static final String KEY_SPEED = "key_speed";
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @BindView(R.id.empty_list_view)
     TextView emptyMessageView;
@@ -70,6 +77,7 @@ public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnIte
         handler = new Handler();
         myDBHelper = new MyDBHelper(getActivity());
         myListener.setMainUI(View.VISIBLE, false, true, getString(R.string.list_title));
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
         initPreferences();
         initRecycleView();
         return view;
@@ -194,6 +202,7 @@ public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnIte
 
     @Override
     public void onItemClick(Person person, MyRecycleViewAdapter.PersonViewHolder holder) {
+        logToFirebase(person);
         AddCardFragment addCardFragment = AddCardFragment.newInstance(person.getId());
         String transitionNameforPhoto = AddCardFragment.TRANSITION_PHOTO_NAME + String.valueOf(person.getId());
         String transitionNameforContainer = AddCardFragment.TRANSITION_CONTAINER_NAME + String.valueOf(person.getId());
@@ -210,6 +219,13 @@ public class ListFragment extends Fragment implements MyRecycleViewAdapter.OnIte
                 .commit();
         myListener.setMainUI(View.INVISIBLE, true, false, getString(R.string.add_card_title));
 
+    }
+
+    private void logToFirebase(Person person) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(PERSON_ID, person.getId());
+        bundle.putString(PERSON_LAST_NAME, person.getLastName());
+        mFirebaseAnalytics.logEvent(PERSON_CLICK, bundle);
     }
 
     @Override
