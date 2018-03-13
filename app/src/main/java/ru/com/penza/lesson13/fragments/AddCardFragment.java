@@ -185,6 +185,8 @@ public class AddCardFragment extends Fragment {
             String address = person.getAddress();
             if(address != null) {
                 positionView.setText(person.getAddress());
+                makeTextViewHyperlink(positionView, positionListener);
+
             }
             showImage();
             myDBHelper.close();
@@ -434,11 +436,13 @@ public class AddCardFragment extends Fragment {
         }
     };
 
-    public static void makeTextViewHyperlink(TextView tv) {
+    public void makeTextViewHyperlink(TextView tv, View.OnClickListener listener) {
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         ssb.append(tv.getText());
         ssb.setSpan(new URLSpan("#"), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         tv.setText(ssb, TextView.BufferType.SPANNABLE);
+        tv.setClickable(true);
+        tv.setOnClickListener(listener);
     }
 
 
@@ -457,9 +461,8 @@ public class AddCardFragment extends Fragment {
                 person.setAddress(resultData.getString(ADDRESS));
                 person.setLongtitude(resultData.getDouble(LONGTITUDE));
                 person.setLatitude(resultData.getDouble(LATITUDE));
-                positionView.setClickable(true);
-                makeTextViewHyperlink(positionView);
-                positionView.setOnClickListener(positionListener);
+                makeTextViewHyperlink(positionView, positionListener);
+
 
 
             }
