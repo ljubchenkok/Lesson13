@@ -39,5 +39,11 @@
     <string name="useRX">Использовать RxJava для загрузки</string>
     <string name="change_bkg">Цвет фона</string>
     <string name="positionLabel">Место встречи</string>
+    <string name="address_found">Адрес найден</string>
+    <string name="no_address_found">Адрес не найден</string>
+    <string name="service_not_available">Сервис не доступен</string>
+    <string name="invalid_lat_long_used">Некорректные координаты</string>
+    <string name="no_location_data_provided">Нет данных о положении</string>
+    <string name="position_failure">Не удалось определить</string>
 
 </resources>
